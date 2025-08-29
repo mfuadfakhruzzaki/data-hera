@@ -41,7 +41,7 @@ type SortConfig = {
   direction: 'ascending' | 'descending';
 } | null;
 
-type FormattedRespondent = Omit<RespondentFromFirestore, 'email'> & {
+type FormattedRespondent = RespondentFromFirestore & {
   age: number;
   bmi: number;
 };
@@ -59,7 +59,7 @@ export default function RespondentsTable({ initialData }: { initialData: Respond
       const dob = new Date(item.dob);
       const age = differenceInYears(new Date(), dob);
       const heightInMeters = item.height / 100;
-      const bmi = parseFloat((item.weight / (heightInMeters * heightInMeters)).toFixed(2));
+      const bmi = (item.weight && item.height) ? parseFloat((item.weight / (heightInMeters * heightInMeters)).toFixed(2)) : 0;
       return { ...item, age, bmi };
     });
   }, [data]);
@@ -151,6 +151,7 @@ export default function RespondentsTable({ initialData }: { initialData: Respond
     { key: 'semester', label: 'Semester' },
     { key: 'phone', label: 'No. Whatsapp' },
     { key: 'bmi', label: 'IMT' },
+    { key: 'createdAt', label: 'Tgl. Pengambilan' },
   ];
 
   return (
@@ -191,7 +192,8 @@ export default function RespondentsTable({ initialData }: { initialData: Respond
                   <TableCell>{item.gender}</TableCell>
                   <TableCell>{item.semester}</TableCell>
                   <TableCell>{item.phone}</TableCell>
-                  <TableCell>{item.bmi}</TableCell>
+                  <TableCell>{item.bmi || 'N/A'}</TableCell>
+                  <TableCell>{format(new Date(item.createdAt), 'dd-MM-yyyy')}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>

@@ -20,7 +20,7 @@ export type RespondentWithId = Respondent & {
 }
 
 // Type for data coming from Firestore, with Timestamps converted to strings
-export type RespondentFromFirestore = Omit<RespondentWithId, 'dob' | 'createdAt' | 'email'> & {
+export type RespondentFromFirestore = Omit<RespondentWithId, 'dob'> & {
   dob: string;
   createdAt: string;
 };

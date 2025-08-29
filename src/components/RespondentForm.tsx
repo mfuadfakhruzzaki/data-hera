@@ -43,11 +43,11 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
           pob: '',
           gender: 'male',
           address: '',
-          semester: 1,
           phone: '',
-          height: 0,
-          weight: 0,
           medicalHistory: '',
+          semester: undefined,
+          height: undefined,
+          weight: undefined,
         },
   });
 
@@ -224,7 +224,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
               <FormItem>
                 <FormLabel>Semester</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="1" {...field} onChange={event => field.onChange(+event.target.value)} value={field.value} />
+                  <Input type="number" placeholder="1" {...field} onChange={event => field.onChange(+event.target.value)} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -250,7 +250,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
               <FormItem>
                 <FormLabel>Tinggi Badan (cm)</FormLabel>
                 <FormControl>
-                   <Input type="number" placeholder="175" {...field} onChange={event => field.onChange(+event.target.value)} value={field.value} />
+                   <Input type="number" placeholder="175" {...field} onChange={event => field.onChange(+event.target.value)} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -263,7 +263,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
               <FormItem>
                 <FormLabel>Berat Badan (kg)</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="70" {...field} onChange={event => field.onChange(+event.target.value)} value={field.value} />
+                  <Input type="number" placeholder="70" {...field} onChange={event => field.onChange(+event.target.value)} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
