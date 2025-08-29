@@ -143,7 +143,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
             control={form.control}
             name="dob"
             render={({ field }) => (
-              <FormItem className="flex flex-col pt-2">
+              <FormItem className="flex flex-col">
                 <FormLabel>Tanggal Lahir</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -178,7 +178,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
             control={form.control}
             name="gender"
             render={({ field }) => (
-              <FormItem className="pt-2">
+              <FormItem>
                 <FormLabel>Jenis Kelamin</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
