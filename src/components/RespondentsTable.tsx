@@ -3,6 +3,8 @@
 import { useState, useMemo, useTransition } from 'react';
 import { differenceInYears, format } from 'date-fns';
 import { ArrowUpDown, Trash, Edit, Download, Loader2 } from 'lucide-react';
+import * as XLSX from 'xlsx';
+
 import {
   Table,
   TableBody,
@@ -50,9 +52,6 @@ function EditDialog({ respondent, onUpdateSuccess }: { respondent: RespondentWit
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const handleSuccess = () => {
-    // We need to construct the updated respondent object to pass back up
-    // This is a bit of a workaround as the form doesn't return the full updated object
-    // A better solution might involve the update action returning the updated object
     onUpdateSuccess(respondent); 
     setIsEditDialogOpen(false);
   };
@@ -133,13 +132,6 @@ export default function RespondentsTable({ initialData }: { initialData: Respond
   };
 
   const handleUpdateSuccess = (updatedRespondent: RespondentWithId) => {
-    // The form doesn't give us the updated data directly, so we have to refetch or manually merge.
-    // For now, let's just optimistically update with the data we have.
-    // A robust solution would have `updateRespondent` return the updated doc.
-    setData(prevData => prevData.map(r => r.id === updatedRespondent.id ? { ...r, ...updatedRespondent, dob: new Date(updatedRespondent.dob).toISOString() } : r));
-    
-    // This is a bit of a hack to refresh data from server. Revalidating path should do this, but client state needs update.
-    // A better approach would be to use a state management library that automatically re-fetches.
     async function refetch() {
         const { getRespondents } = await import('@/app/actions');
         const respondents = await getRespondents();
@@ -148,39 +140,28 @@ export default function RespondentsTable({ initialData }: { initialData: Respond
     refetch();
   };
   
-  const exportToCsv = () => {
-    const headers = ['ID', 'Name', 'Place of Birth', 'Date of Birth', 'Age', 'Gender', 'Address', 'Semester', 'Phone', 'Height (cm)', 'Weight (kg)', 'BMI', 'Medical History', 'Created At'];
-    const csvRows = [headers.join(',')];
-    
-    for (const row of filteredData) {
-      const values = [
-        row.id,
-        `"${row.name.replace(/"/g, '""')}"`,
-        `"${row.pob.replace(/"/g, '""')}"`,
-        format(new Date(row.dob), 'yyyy-MM-dd'),
-        row.age,
-        row.gender,
-        `"${row.address.replace(/"/g, '""')}"`,
-        row.semester,
-        row.phone,
-        row.height,
-        row.weight,
-        row.bmi,
-        `"${(row.medicalHistory || '').replace(/"/g, '""')}"`,
-        format(new Date(row.createdAt), 'yyyy-MM-dd HH:mm:ss')
-      ];
-      csvRows.push(values.join(','));
-    }
+  const exportToExcel = () => {
+    const dataToExport = filteredData.map(row => ({
+        'ID': row.id,
+        'Name': row.name,
+        'Place of Birth': row.pob,
+        'Date of Birth': format(new Date(row.dob), 'yyyy-MM-dd'),
+        'Age': row.age,
+        'Gender': row.gender === 'male' ? 'Laki-laki' : 'Perempuan',
+        'Address': row.address,
+        'Semester': row.semester,
+        'Phone': row.phone,
+        'Height (cm)': row.height,
+        'Weight (kg)': row.weight,
+        'BMI': row.bmi,
+        'Medical History': row.medicalHistory || '',
+        'Created At': format(new Date(row.createdAt), 'yyyy-MM-dd HH:mm:ss')
+    }));
 
-    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.setAttribute('hidden', '');
-    a.setAttribute('href', url);
-    a.setAttribute('download', `respondents_${format(new Date(), 'yyyyMMdd')}.csv`);
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Respondents');
+    XLSX.writeFile(workbook, `respondents_${format(new Date(), 'yyyyMMdd')}.xlsx`);
   };
   
   const headers: { key: keyof FormattedRespondent; label: string }[] = [
@@ -202,9 +183,9 @@ export default function RespondentsTable({ initialData }: { initialData: Respond
           onChange={(e) => setFilter(e.target.value)}
           className="max-w-sm"
         />
-        <Button onClick={exportToCsv} variant="outline">
+        <Button onClick={exportToExcel} variant="outline">
             <Download className="mr-2 h-4 w-4" />
-            Export CSV
+            Export Excel
         </Button>
       </div>
       <div className="rounded-md border">
@@ -216,7 +197,7 @@ export default function RespondentsTable({ initialData }: { initialData: Respond
                   <Button
                     variant="ghost"
                     onClick={() => requestSort(header.key)}
-                    className="px-0 hover:bg-transparent"
+                    className="px-0 hover:bg-transparent justify-start"
                   >
                     {header.label}
                     <ArrowUpDown className="ml-2 h-4 w-4" />
