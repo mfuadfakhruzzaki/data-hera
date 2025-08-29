@@ -37,6 +37,9 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
       ? {
           ...respondent,
           dob: new Date(respondent.dob),
+          semester: respondent.semester || undefined,
+          height: respondent.height || undefined,
+          weight: respondent.weight || undefined,
         }
       : {
           name: '',
@@ -45,9 +48,9 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
           address: '',
           phone: '',
           medicalHistory: '',
-          semester: undefined,
-          height: undefined,
-          weight: undefined,
+          semester: '' as any,
+          height: '' as any,
+          weight: '' as any,
         },
   });
 
@@ -112,7 +115,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
           <FormField
             control={form.control}
             name="name"
@@ -143,7 +146,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
             control={form.control}
             name="dob"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
+              <FormItem className="flex flex-col pt-2">
                 <FormLabel>Tanggal Lahir</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -178,9 +181,9 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
             control={form.control}
             name="gender"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
+              <FormItem className="flex flex-col pt-2">
                 <FormLabel>Jenis Kelamin</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                 <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Pilih jenis kelamin" />
@@ -275,7 +278,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
           />
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
             <Card>
                 <CardContent className="p-4">
                     <p className="text-sm font-medium text-muted-foreground">Umur</p>
@@ -290,7 +293,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
             </Card>
         </div>
 
-        <Button type="submit" disabled={isPending} className="w-full md:w-auto">
+        <Button type="submit" disabled={isPending} className="w-full md:w-auto !mt-8">
           {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {respondent ? 'Update Responden' : 'Tambah Responden'}
         </Button>
