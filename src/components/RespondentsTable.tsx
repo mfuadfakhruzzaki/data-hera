@@ -41,7 +41,7 @@ type SortConfig = {
   direction: 'ascending' | 'descending';
 } | null;
 
-type FormattedRespondent = RespondentFromFirestore & {
+type FormattedRespondent = Omit<RespondentFromFirestore, 'email'> & {
   age: number;
   bmi: number;
 };
@@ -80,7 +80,6 @@ export default function RespondentsTable({ initialData }: { initialData: Respond
 
     return sortableItems.filter((item) =>
       item.name.toLowerCase().includes(filter.toLowerCase()) ||
-      item.email.toLowerCase().includes(filter.toLowerCase()) ||
       item.phone.includes(filter)
     );
   }, [formattedData, filter, sortConfig]);
@@ -111,7 +110,7 @@ export default function RespondentsTable({ initialData }: { initialData: Respond
   };
   
   const exportToCsv = () => {
-    const headers = ['ID', 'Name', 'Place of Birth', 'Date of Birth', 'Age', 'Gender', 'Address', 'Semester', 'Phone', 'Email', 'Height (cm)', 'Weight (kg)', 'BMI', 'Medical History', 'Created At'];
+    const headers = ['ID', 'Name', 'Place of Birth', 'Date of Birth', 'Age', 'Gender', 'Address', 'Semester', 'Phone', 'Height (cm)', 'Weight (kg)', 'BMI', 'Medical History', 'Created At'];
     const csvRows = [headers.join(',')];
     
     for (const row of filteredData) {
@@ -125,7 +124,6 @@ export default function RespondentsTable({ initialData }: { initialData: Respond
         `"${row.address.replace(/"/g, '""')}"`,
         row.semester,
         row.phone,
-        row.email,
         row.height,
         row.weight,
         row.bmi,
@@ -159,7 +157,7 @@ export default function RespondentsTable({ initialData }: { initialData: Respond
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <Input
-          placeholder="Filter by name, email, or phone..."
+          placeholder="Filter by name or phone..."
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           className="max-w-sm"

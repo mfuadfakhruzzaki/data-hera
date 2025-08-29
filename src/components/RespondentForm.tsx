@@ -45,7 +45,6 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
           address: '',
           semester: 1,
           phone: '',
-          email: '',
           height: 0,
           weight: 0,
           medicalHistory: '',
@@ -121,7 +120,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
               <FormItem>
                 <FormLabel>Nama</FormLabel>
                 <FormControl>
-                  <Input placeholder="John Doe" {...field} />
+                  <Input placeholder="Nama Lengkap" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -134,7 +133,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
               <FormItem>
                 <FormLabel>Tempat Lahir</FormLabel>
                 <FormControl>
-                  <Input placeholder="Jakarta" {...field} />
+                  <Input placeholder="Kota Kelahiran" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -151,9 +150,9 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
                     <FormControl>
                       <Button
                         variant={'outline'}
-                        className={cn('pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}
+                        className={cn('w-full justify-start pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}
                       >
-                        {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
+                        {field.value ? format(field.value, 'PPP') : <span>Pilih tanggal</span>}
                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                       </Button>
                     </FormControl>
@@ -212,7 +211,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
               <FormItem className="md:col-span-2">
                 <FormLabel>Alamat</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="123 Main St, Anytown..." {...field} />
+                  <Textarea placeholder="Jl. Jendral Sudirman No. 1, Jakarta" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -238,20 +237,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
               <FormItem>
                 <FormLabel>No. Whatsapp</FormLabel>
                 <FormControl>
-                  <Input placeholder="+1234567890" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="john.doe@example.com" {...field} />
+                  <Input placeholder="08..." {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -290,7 +276,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
               <FormItem className="md:col-span-2">
                 <FormLabel>Riwayat Penyakit</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="e.g. Asthma, Diabetes" {...field} />
+                  <Textarea placeholder="Contoh: Asma, Diabetes" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -302,7 +288,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
             <Card>
                 <CardContent className="p-4">
                     <p className="text-sm font-medium text-muted-foreground">Umur</p>
-                    <p className="text-2xl font-bold">{age !== null ? `${age} years` : 'N/A'}</p>
+                    <p className="text-2xl font-bold">{age !== null ? `${age} tahun` : 'N/A'}</p>
                 </CardContent>
             </Card>
             <Card>
@@ -315,7 +301,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
 
         <Button type="submit" disabled={isPending} className="w-full md:w-auto">
           {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {respondent ? 'Update Respondent' : 'Add Respondent'}
+          {respondent ? 'Update Responden' : 'Tambah Responden'}
         </Button>
       </form>
     </Form>

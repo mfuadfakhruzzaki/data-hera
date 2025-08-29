@@ -61,7 +61,6 @@ export async function getRespondents(): Promise<RespondentFromFirestore[]> {
         address: data.address,
         semester: data.semester,
         phone: data.phone,
-        email: data.email,
         height: data.height,
         weight: data.weight,
         medicalHistory: data.medicalHistory,
