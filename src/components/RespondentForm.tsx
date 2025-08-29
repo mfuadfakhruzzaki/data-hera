@@ -41,7 +41,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
       : {
           name: '',
           pob: '',
-          gender: 'male',
+          gender: undefined,
           address: '',
           phone: '',
           medicalHistory: '',
@@ -178,7 +178,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
             control={form.control}
             name="gender"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="flex flex-col">
                 <FormLabel>Jenis Kelamin</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
