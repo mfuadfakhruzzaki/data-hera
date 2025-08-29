@@ -37,6 +37,12 @@ import RespondentForm from './RespondentForm';
 import type { RespondentFromFirestore, RespondentWithId } from '@/lib/definitions';
 import { deleteRespondent } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 type SortConfig = {
   key: keyof FormattedRespondent;
@@ -140,8 +146,8 @@ export default function RespondentsTable({ initialData }: { initialData: Respond
     refetch();
   };
   
-  const exportToExcel = () => {
-    const dataToExport = filteredData.map(row => ({
+  const getExportData = () => {
+    return filteredData.map(row => ({
         'ID': row.id,
         'Name': row.name,
         'Place of Birth': row.pob,
@@ -157,11 +163,31 @@ export default function RespondentsTable({ initialData }: { initialData: Respond
         'Medical History': row.medicalHistory || '',
         'Created At': format(new Date(row.createdAt), 'yyyy-MM-dd HH:mm:ss')
     }));
+  }
 
+  const exportToExcel = () => {
+    const dataToExport = getExportData();
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Respondents');
     XLSX.writeFile(workbook, `respondents_${format(new Date(), 'yyyyMMdd')}.xlsx`);
+  };
+
+  const exportToCsv = () => {
+    const dataToExport = getExportData();
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const csv = XLSX.utils.sheet_to_csv(worksheet);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `respondents_${format(new Date(), 'yyyyMMdd')}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
   };
   
   const headers: { key: keyof FormattedRespondent; label: string }[] = [
@@ -183,10 +209,18 @@ export default function RespondentsTable({ initialData }: { initialData: Respond
           onChange={(e) => setFilter(e.target.value)}
           className="max-w-sm"
         />
-        <Button onClick={exportToExcel} variant="outline">
-            <Download className="mr-2 h-4 w-4" />
-            Export Excel
-        </Button>
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                    <Download className="mr-2 h-4 w-4" />
+                    Export
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+                <DropdownMenuItem onClick={exportToExcel}>Export to Excel (.xlsx)</DropdownMenuItem>
+                <DropdownMenuItem onClick={exportToCsv}>Export to CSV (.csv)</DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       <div className="rounded-md border">
         <Table>
