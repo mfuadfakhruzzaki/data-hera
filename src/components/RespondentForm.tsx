@@ -40,10 +40,17 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
           semester: respondent.semester || undefined,
           height: respondent.height || undefined,
           weight: respondent.weight || undefined,
+          gender: respondent.gender || undefined,
+          pob: respondent.pob || '',
+          address: respondent.address || '',
+          phone: respondent.phone || '',
+          medicalHistory: respondent.medicalHistory || '',
+
         }
       : {
           name: '',
           pob: '',
+          dob: undefined,
           gender: undefined,
           address: '',
           phone: '',
@@ -54,7 +61,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
         },
   });
 
-  const { watch, setValue } = form;
+  const { watch } = form;
   const dob = watch('dob');
   const height = watch('height');
   const weight = watch('weight');
@@ -218,7 +225,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
               <FormItem>
                 <FormLabel>Semester</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="1" {...field} onChange={event => field.onChange(+event.target.value)} />
+                  <Input type="number" placeholder="1" {...field} onChange={event => field.onChange(event.target.value === '' ? '' : +event.target.value)} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -244,7 +251,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
               <FormItem>
                 <FormLabel>Tinggi Badan (cm)</FormLabel>
                 <FormControl>
-                   <Input type="number" placeholder="175" {...field} onChange={event => field.onChange(+event.target.value)} />
+                   <Input type="number" placeholder="175" {...field} onChange={event => field.onChange(event.target.value === '' ? '' : +event.target.value)} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -257,7 +264,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
               <FormItem>
                 <FormLabel>Berat Badan (kg)</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="70" {...field} onChange={event => field.onChange(+event.target.value)} />
+                  <Input type="number" placeholder="70" {...field} onChange={event => field.onChange(event.target.value === '' ? '' : +event.target.value)} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

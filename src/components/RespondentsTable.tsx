@@ -46,12 +46,40 @@ type FormattedRespondent = RespondentFromFirestore & {
   bmi: number;
 };
 
+function EditDialog({ respondent, onUpdateSuccess }: { respondent: RespondentWithId, onUpdateSuccess: (respondent: RespondentWithId) => void }) {
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  const handleSuccess = () => {
+    // We need to construct the updated respondent object to pass back up
+    // This is a bit of a workaround as the form doesn't return the full updated object
+    // A better solution might involve the update action returning the updated object
+    onUpdateSuccess(respondent); 
+    setIsEditDialogOpen(false);
+  };
+
+  return (
+     <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+      <DialogTrigger asChild>
+         <Button variant="ghost" size="icon">
+          <Edit className="h-4 w-4" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit Responden</DialogTitle>
+        </DialogHeader>
+        <RespondentForm respondent={respondent} onSuccess={handleSuccess} />
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+
 export default function RespondentsTable({ initialData }: { initialData: RespondentFromFirestore[] }) {
   const [data, setData] = useState<RespondentFromFirestore[]>(initialData);
   const [filter, setFilter] = useState('');
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
   const [isPending, startTransition] = useTransition();
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const formattedData = useMemo(() => {
@@ -105,8 +133,19 @@ export default function RespondentsTable({ initialData }: { initialData: Respond
   };
 
   const handleUpdateSuccess = (updatedRespondent: RespondentWithId) => {
-    setIsEditDialogOpen(false);
-    setData(prevData => prevData.map(r => r.id === updatedRespondent.id ? { ...r, ...updatedRespondent, dob: updatedRespondent.dob.toISOString() } : r));
+    // The form doesn't give us the updated data directly, so we have to refetch or manually merge.
+    // For now, let's just optimistically update with the data we have.
+    // A robust solution would have `updateRespondent` return the updated doc.
+    setData(prevData => prevData.map(r => r.id === updatedRespondent.id ? { ...r, ...updatedRespondent, dob: new Date(updatedRespondent.dob).toISOString() } : r));
+    
+    // This is a bit of a hack to refresh data from server. Revalidating path should do this, but client state needs update.
+    // A better approach would be to use a state management library that automatically re-fetches.
+    async function refetch() {
+        const { getRespondents } = await import('@/app/actions');
+        const respondents = await getRespondents();
+        setData(respondents);
+    }
+    refetch();
   };
   
   const exportToCsv = () => {
@@ -174,13 +213,17 @@ export default function RespondentsTable({ initialData }: { initialData: Respond
             <TableRow>
               {headers.map((header) => (
                 <TableHead key={header.key}>
-                  <Button variant="ghost" onClick={() => requestSort(header.key)}>
+                  <Button
+                    variant="ghost"
+                    onClick={() => requestSort(header.key)}
+                    className="px-0 hover:bg-transparent"
+                  >
                     {header.label}
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                   </Button>
                 </TableHead>
               ))}
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -189,27 +232,14 @@ export default function RespondentsTable({ initialData }: { initialData: Respond
                 <TableRow key={item.id} className="hover:bg-muted/50 transition-colors">
                   <TableCell className="font-medium">{item.name}</TableCell>
                   <TableCell>{item.age}</TableCell>
-                  <TableCell>{item.gender}</TableCell>
+                  <TableCell>{item.gender === 'male' ? 'Laki-laki' : 'Perempuan'}</TableCell>
                   <TableCell>{item.semester}</TableCell>
                   <TableCell>{item.phone}</TableCell>
                   <TableCell>{item.bmi || 'N/A'}</TableCell>
                   <TableCell>{format(new Date(item.createdAt), 'dd-MM-yyyy')}</TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-                        <DialogTrigger asChild>
-                           <Button variant="ghost" size="icon">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Edit Respondent</DialogTitle>
-                          </DialogHeader>
-                          <RespondentForm respondent={item} onSuccess={() => setIsEditDialogOpen(false)} />
-                        </DialogContent>
-                      </Dialog>
-                      
+                    <div className="flex items-center justify-end gap-2">
+                       <EditDialog respondent={item} onUpdateSuccess={handleUpdateSuccess} />
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
