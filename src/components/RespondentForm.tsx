@@ -17,6 +17,8 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from './ui/card';
+import { RadioGroup, RadioGroupItem } from './ui/radio-group';
+import { Textarea } from './ui/textarea';
 
 type RespondentFormProps = {
   respondent?: Respondent & { id: string };
@@ -38,10 +40,15 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
         }
       : {
           name: '',
+          pob: '',
+          gender: 'male',
+          address: '',
+          semester: 1,
           phone: '',
           email: '',
           height: 0,
           weight: 0,
+          medicalHistory: '',
         },
   });
 
@@ -96,15 +103,28 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Full Name</FormLabel>
+                <FormLabel>Nama</FormLabel>
                 <FormControl>
                   <Input placeholder="John Doe" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="pob"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tempat Lahir</FormLabel>
+                <FormControl>
+                  <Input placeholder="Jakarta" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -115,7 +135,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
             name="dob"
             render={({ field }) => (
               <FormItem className="flex flex-col pt-2">
-                <FormLabel>Date of Birth</FormLabel>
+                <FormLabel>Tanggal Lahir</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
@@ -145,12 +165,68 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
               </FormItem>
             )}
           />
+           <FormField
+            control={form.control}
+            name="gender"
+            render={({ field }) => (
+              <FormItem className="space-y-3">
+                <FormLabel>Jenis Kelamin</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="flex space-x-4"
+                  >
+                    <FormItem className="flex items-center space-x-2">
+                      <FormControl>
+                        <RadioGroupItem value="male" />
+                      </FormControl>
+                      <FormLabel className="font-normal">Laki-laki</FormLabel>
+                    </FormItem>
+                    <FormItem className="flex items-center space-x-2">
+                      <FormControl>
+                        <RadioGroupItem value="female" />
+                      </FormControl>
+                      <FormLabel className="font-normal">Perempuan</FormLabel>
+                    </FormItem>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+           <FormField
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <FormItem className="md:col-span-2">
+                <FormLabel>Alamat</FormLabel>
+                <FormControl>
+                  <Textarea placeholder="123 Main St, Anytown..." {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+           <FormField
+            control={form.control}
+            name="semester"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Semester</FormLabel>
+                <FormControl>
+                  <Input type="number" placeholder="1" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>WhatsApp Number</FormLabel>
+                <FormLabel>No. Whatsapp</FormLabel>
                 <FormControl>
                   <Input placeholder="+1234567890" {...field} />
                 </FormControl>
@@ -176,7 +252,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
             name="height"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Height (cm)</FormLabel>
+                <FormLabel>Tinggi Badan (cm)</FormLabel>
                 <FormControl>
                   <Input type="number" placeholder="175" {...field} />
                 </FormControl>
@@ -189,9 +265,22 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
             name="weight"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Weight (kg)</FormLabel>
+                <FormLabel>Berat Badan (kg)</FormLabel>
                 <FormControl>
                   <Input type="number" placeholder="70" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+            <FormField
+            control={form.control}
+            name="medicalHistory"
+            render={({ field }) => (
+              <FormItem className="md:col-span-2">
+                <FormLabel>Riwayat Penyakit</FormLabel>
+                <FormControl>
+                  <Textarea placeholder="e.g. Asthma, Diabetes" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -202,13 +291,13 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>
                 <CardContent className="p-4">
-                    <p className="text-sm font-medium text-muted-foreground">Calculated Age</p>
+                    <p className="text-sm font-medium text-muted-foreground">Umur</p>
                     <p className="text-2xl font-bold">{age !== null ? `${age} years` : 'N/A'}</p>
                 </CardContent>
             </Card>
             <Card>
                 <CardContent className="p-4">
-                    <p className="text-sm font-medium text-muted-foreground">Calculated BMI</p>
+                    <p className="text-sm font-medium text-muted-foreground">IMT (BMI)</p>
                     <p className="text-2xl font-bold">{bmi !== null ? bmi : 'N/A'}</p>
                 </CardContent>
             </Card>

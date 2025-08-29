@@ -111,20 +111,25 @@ export default function RespondentsTable({ initialData }: { initialData: Respond
   };
   
   const exportToCsv = () => {
-    const headers = ['ID', 'Name', 'Date of Birth', 'Age', 'Phone', 'Email', 'Height (cm)', 'Weight (kg)', 'BMI', 'Created At'];
+    const headers = ['ID', 'Name', 'Place of Birth', 'Date of Birth', 'Age', 'Gender', 'Address', 'Semester', 'Phone', 'Email', 'Height (cm)', 'Weight (kg)', 'BMI', 'Medical History', 'Created At'];
     const csvRows = [headers.join(',')];
     
     for (const row of filteredData) {
       const values = [
         row.id,
         `"${row.name.replace(/"/g, '""')}"`,
+        `"${row.pob.replace(/"/g, '""')}"`,
         format(new Date(row.dob), 'yyyy-MM-dd'),
         row.age,
+        row.gender,
+        `"${row.address.replace(/"/g, '""')}"`,
+        row.semester,
         row.phone,
         row.email,
         row.height,
         row.weight,
         row.bmi,
+        `"${(row.medicalHistory || '').replace(/"/g, '""')}"`,
         format(new Date(row.createdAt), 'yyyy-MM-dd HH:mm:ss')
       ];
       csvRows.push(values.join(','));
@@ -142,13 +147,12 @@ export default function RespondentsTable({ initialData }: { initialData: Respond
   };
   
   const headers: { key: keyof FormattedRespondent; label: string }[] = [
-    { key: 'name', label: 'Name' },
-    { key: 'age', label: 'Age' },
-    { key: 'phone', label: 'WhatsApp' },
-    { key: 'email', label: 'Email' },
-    { key: 'height', label: 'Height (cm)' },
-    { key: 'weight', label: 'Weight (kg)' },
-    { key: 'bmi', label: 'BMI' },
+    { key: 'name', label: 'Nama' },
+    { key: 'age', label: 'Umur' },
+    { key: 'gender', label: 'Jenis Kelamin' },
+    { key: 'semester', label: 'Semester' },
+    { key: 'phone', label: 'No. Whatsapp' },
+    { key: 'bmi', label: 'IMT' },
   ];
 
   return (
@@ -186,10 +190,9 @@ export default function RespondentsTable({ initialData }: { initialData: Respond
                 <TableRow key={item.id} className="hover:bg-muted/50 transition-colors">
                   <TableCell className="font-medium">{item.name}</TableCell>
                   <TableCell>{item.age}</TableCell>
+                  <TableCell>{item.gender}</TableCell>
+                  <TableCell>{item.semester}</TableCell>
                   <TableCell>{item.phone}</TableCell>
-                  <TableCell>{item.email}</TableCell>
-                  <TableCell>{item.height}</TableCell>
-                  <TableCell>{item.weight}</TableCell>
                   <TableCell>{item.bmi}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">

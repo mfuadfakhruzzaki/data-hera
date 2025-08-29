@@ -49,11 +49,16 @@ export async function getRespondents(): Promise<RespondentFromFirestore[]> {
       return {
         id: doc.id,
         name: data.name,
+        pob: data.pob,
         dob: (data.dob as Timestamp).toDate().toISOString(),
+        gender: data.gender,
+        address: data.address,
+        semester: data.semester,
         phone: data.phone,
         email: data.email,
         height: data.height,
         weight: data.weight,
+        medicalHistory: data.medicalHistory,
         createdAt: (data.createdAt as Timestamp)?.toDate().toISOString() || new Date().toISOString(),
       };
     });
