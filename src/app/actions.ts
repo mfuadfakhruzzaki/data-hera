@@ -10,10 +10,16 @@ type ActionResponse = {
   message: string;
 }
 
-export async function addRespondent(data: Respondent): Promise<ActionResponse> {
-  const validatedFields = respondentSchema.safeParse(data);
+export async function addRespondent(data: Omit<Respondent, 'dob'> & { dob: string }): Promise<ActionResponse> {
+  const dataWithDate = {
+    ...data,
+    dob: new Date(data.dob),
+  };
+
+  const validatedFields = respondentSchema.safeParse(dataWithDate);
 
   if (!validatedFields.success) {
+    console.error('Validation failed:', validatedFields.error.flatten().fieldErrors);
     return { success: false, message: "Validation failed. Please check your input." };
   }
 
@@ -68,10 +74,15 @@ export async function getRespondents(): Promise<RespondentFromFirestore[]> {
   }
 }
 
-export async function updateRespondent(id: string, data: Respondent): Promise<ActionResponse> {
-  const validatedFields = respondentSchema.safeParse(data);
+export async function updateRespondent(id: string, data: Omit<Respondent, 'dob'> & { dob: string }): Promise<ActionResponse> {
+  const dataWithDate = {
+    ...data,
+    dob: new Date(data.dob),
+  };
+  const validatedFields = respondentSchema.safeParse(dataWithDate);
 
   if (!validatedFields.success) {
+    console.error('Validation failed:', validatedFields.error.flatten().fieldErrors);
     return { success: false, message: "Validation failed. Please check your input." };
   }
   

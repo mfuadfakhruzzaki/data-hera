@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { CalendarIcon, Loader2 } from 'lucide-react';
 import { format, differenceInYears } from 'date-fns';
 
-import { respondentSchema, type Respondent } from '@/lib/definitions';
+import { respondentSchema, type Respondent, type RespondentWithId } from '@/lib/definitions';
 import { addRespondent, updateRespondent } from '@/app/actions';
 import { cn } from '@/lib/utils';
 
@@ -21,7 +21,7 @@ import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Textarea } from './ui/textarea';
 
 type RespondentFormProps = {
-  respondent?: Respondent & { id: string };
+  respondent?: RespondentWithId;
   onSuccess?: () => void;
 };
 
@@ -77,7 +77,17 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
 
   const onSubmit = (data: Respondent) => {
     startTransition(async () => {
-      const action = respondent ? () => updateRespondent(respondent.id, data) : () => addRespondent(data);
+      // Because data is serialized when passing from client to server,
+      // the Date object becomes a string. We handle this on the server.
+      const dataToSend = {
+          ...data,
+          dob: data.dob.toISOString(),
+      };
+      
+      const action = respondent 
+        ? () => updateRespondent(respondent.id, dataToSend) 
+        : () => addRespondent(dataToSend);
+
       const result = await action();
       if (result.success) {
         toast({
@@ -169,7 +179,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
             control={form.control}
             name="gender"
             render={({ field }) => (
-              <FormItem className="space-y-3">
+              <FormItem className="space-y-3 pt-2">
                 <FormLabel>Jenis Kelamin</FormLabel>
                 <FormControl>
                   <RadioGroup
@@ -215,7 +225,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
               <FormItem>
                 <FormLabel>Semester</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="1" {...field} />
+                  <Input type="number" placeholder="1" {...field} onChange={event => field.onChange(+event.target.value)} value={field.value} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -254,7 +264,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
               <FormItem>
                 <FormLabel>Tinggi Badan (cm)</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="175" {...field} />
+                   <Input type="number" placeholder="175" {...field} onChange={event => field.onChange(+event.target.value)} value={field.value} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -267,7 +277,7 @@ export default function RespondentForm({ respondent, onSuccess }: RespondentForm
               <FormItem>
                 <FormLabel>Berat Badan (kg)</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="70" {...field} />
+                  <Input type="number" placeholder="70" {...field} onChange={event => field.onChange(+event.target.value)} value={field.value} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

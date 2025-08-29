@@ -14,12 +14,11 @@ export const respondentSchema = z.object({
   medicalHistory: z.string().optional(),
 });
 
-export const respondentSchemaWithId = respondentSchema.extend({
-  id: z.string(),
-});
-
 export type Respondent = z.infer<typeof respondentSchema>;
-export type RespondentWithId = z.infer<typeof respondentSchemaWithId>;
+
+export type RespondentWithId = Respondent & {
+  id: string;
+}
 
 // Type for data coming from Firestore, with Timestamps converted to strings
 export type RespondentFromFirestore = Omit<RespondentWithId, 'dob' | 'createdAt'> & {
